@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.kosta.dao.mapper.AttractionMapper">
+
+	<resultMap type="Attraction" id="attractionResult">
+		<id property="attraction_id" column="id" />
+	</resultMap>
+
+	<select id="attractionFindByName" parameterType="String" resultMap="attractionResult">
+		SELECT * FROM attraction_tb
+		WHERE title like #{title}
+	</select>
+	
+	<select id="attractionFindById" parameterType="int" resultMap="attractionResult">
+		SELECT  id, state_id, title, address, content, image, writer_id FROM attraction_tb
+		WHERE id = #{attraction_id}
+	</select>
+	
+	<select id="attractionFindByState" parameterType="int" resultMap="attractionResult">
+		SELECT * FROM attraction_tb
+		WHERE state_id = #{state_id}
+	</select>
+	
+	<insert id="createAttraction" parameterType="Attraction">
+		INSERT INTO attraction_tb(id, state_id, title, address, content, image, writer_id)
+		VALUES(attraction_tb_seq.nextval, #{state_id}, #{title}, #{address}, #{content}, #{image}, #{writer_id})
+	</insert>
+	
+	<update id="updateAttraction" parameterType="Attraction">
+		UPDATE attraction_tb SET state_id = #{state_id}, title = #{title}, address = #{address}, content = #{content}, image = #{image}, writer_id = #{writer_id}
+		WHERE id = #{attraction_id} 
+	</update>
+	
+	<delete id="deleteAttraction" parameterType="int">
+		DELETE FROM attraction_tb
+		WHERE id = #{attraction_id}
+	</delete>
+	
+	<insert id="createFavorites" parameterType="hashmap">
+		INSERT INTO favorites_tb(user_id, attraction_id)
+		VALUES(#{user_id}, #{attraction_id})
+	</insert>
+	
+	<delete id="deleteFavorites" parameterType="hashmap">
+		DELETE FROM favorites_tb
+		WHERE user_id = #{user_id}
+		AND attraction_id = #{attraction_id}
+	</delete>
+	
+	<select id="favoritesFindAll" parameterType="String" resultMap="attractionResult">
+		SELECT b.* FROM favorites_tb a
+		INNER JOIN attraction_tb b ON a.attraction_id = b.id
+		WHERE a.user_id = #{user_id}
+	</select>
+	
+</mapper>
